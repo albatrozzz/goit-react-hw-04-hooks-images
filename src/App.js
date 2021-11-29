@@ -32,10 +32,13 @@ function App(){
       setSearchResults(newPictures)
       setShowLoading(false)
     }).catch(error => console.log(error))
+    // eslint-disable-next-line
   }, [searchQuery, pageNumber])
 
-const onSubmitForm = (searchQuery) => {
-  setSearchQuery(searchQuery)
+const onSubmitForm = (event) => {
+  event.preventDefault()
+  console.dir(event.target.lastChild.value)
+  setSearchQuery(event.target.lastChild.value)
   setPageNumber(1)
   setSearchResults([])
   setTotalPages(null)
