@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Loader from "react-loader-spinner"
 import s from './App.module.css';
 import "react-loader-spinner/dist/loader/css/react-spinner-loader.css";
@@ -18,30 +18,29 @@ function App(){
   const [showLoading, setShowLoading] = useState(false)
   const [showModal, setShowModal] = useState(false)
 
-
-// onSubmitForm = (searchQuery) => {
-//   const startPage = 1
-
-//   this.setState({
-//     searchQuery,
-//     searchResults: [],
-//     pageNumber: startPage,
-//     totalPages: null
-//   })
-//   this.findImages(searchQuery, startPage)
-//   }
-
-  const findImages = async (query, currentPage) => {
-    setShowLoading(true)
-    const response = await api.searchQuery(query, currentPage)
-    setTotalPages(Math.ceil(response.total / response.hits.length))
-    const newPictures = searchResults.concat(response.hits)
-    if (currentPage === totalPages){
-      setTotalPages(null)
+  useEffect(() => {
+    if (searchQuery === ''){
+      return
     }
-    setSearchResults(newPictures)
-    setShowLoading(false)
+    setShowLoading(true)
+    api.searchQuery(searchQuery, pageNumber).then(response => {
+      setTotalPages(Math.ceil(response.total / response.hits.length))
+      const newPictures = searchResults.concat(response.hits)
+      if (pageNumber === totalPages){
+        setTotalPages(null)
+      }
+      setSearchResults(newPictures)
+      setShowLoading(false)
+    }).catch(error => console.log(error))
+  }, [searchQuery, pageNumber])
+
+const onSubmitForm = (searchQuery) => {
+  setSearchQuery(searchQuery)
+  setPageNumber(1)
+  setSearchResults([])
+  setTotalPages(null)
   }
+
 
   const loadMoreImages = () => {
     setPageNumber(prev => prev + 1)
@@ -62,16 +61,16 @@ function App(){
   
     return(
       <div className = {s.App}> 
-        <Searchbar onSubmit = {this.onSubmitForm}/>
+        <Searchbar onSubmit = {onSubmitForm}/>
         <ImageGallery onClick = {renderModalImage}>
-          <ImageGalleryItem array = {this.state.searchResults} />
+          <ImageGalleryItem array = {searchResults} />
         </ImageGallery>
         <Loader
           type="Circles"
           color="#00BFFF"
           height={100}
           width={100}
-          visible={this.state.showLoading}
+          visible={showLoading}
         />
         {totalPages && <Button onClick = {loadMoreImages}/>}
         {showModal && <Modal image = {modalImage} closeModal = {closeModal}/>}
