@@ -1,4 +1,4 @@
-import { Component } from 'react';
+import { useState } from 'react';
 import Loader from "react-loader-spinner"
 import s from './App.module.css';
 import "react-loader-spinner/dist/loader/css/react-spinner-loader.css";
@@ -9,77 +9,61 @@ import Button from './components/Button/Button';
 import Modal from './components/Modal/Modal';
 import api from './servises/api/api';
 
-class App extends Component {
-state={
-  searchQuery: '',
-  searchResults: [],
-  pageNumber: 1,
-  totalPages: null,
-  showModal: false,
-  modalImage: [],
-  showLoading: false
-}
+function App(){
+  const [searchQuery, setSearchQuery] = useState('')
+  const [searchResults, setSearchResults] = useState([])
+  const [pageNumber, setPageNumber] = useState(1)
+  const [totalPages, setTotalPages] = useState(null)
+  const [modalImage, setModalImage] = useState([])
+  const [showLoading, setShowLoading] = useState(false)
+  const [showModal, setShowModal] = useState(false)
 
-onSubmitForm = (searchQuery) => {
-  const startPage = 1
 
-  this.setState({
-    searchQuery,
-    searchResults: [],
-    pageNumber: startPage,
-    totalPages: null
-  })
-  this.findImages(searchQuery, startPage)
-  }
+// onSubmitForm = (searchQuery) => {
+//   const startPage = 1
 
-  findImages = async (query, currentPage) => {
-    this.setState({
-      showLoading: true
-    })
+//   this.setState({
+//     searchQuery,
+//     searchResults: [],
+//     pageNumber: startPage,
+//     totalPages: null
+//   })
+//   this.findImages(searchQuery, startPage)
+//   }
+
+  const findImages = async (query, currentPage) => {
+    setShowLoading(true)
     const response = await api.searchQuery(query, currentPage)
-    let totalPages = Math.ceil(response.total / response.hits.length)
-    const newPictures = this.state.searchResults.concat(response.hits)
-    if (currentPage === this.state.totalPages){
-      totalPages = null
+    setTotalPages(Math.ceil(response.total / response.hits.length))
+    const newPictures = searchResults.concat(response.hits)
+    if (currentPage === totalPages){
+      setTotalPages(null)
     }
-    this.setState({
-      searchResults: newPictures,
-      totalPages,
-      showLoading: false
-    })
+    setSearchResults(newPictures)
+    setShowLoading(false)
   }
 
-loadMoreImages = () => {
-  const nextPage = this.state.pageNumber + 1
-  this.setState({
-    pageNumber: nextPage
-  })
+  const loadMoreImages = () => {
+    setPageNumber(prev => prev + 1)
+  }
 
-  this.findImages(this.state.searchQuery, nextPage)
-}
+  const renderModalImage = (event) => {
+    const elemNumber = searchResults.map(item => {
+      return item.id
+    }).indexOf(Number(event.target.id))
+    const elem = searchResults[elemNumber]
+    setModalImage(elem)
+    setShowModal(true)
+  }
 
-renderModalImage = (event) => {
-  const elemNumber = this.state.searchResults.map(item => {
-    return item.id
-  }).indexOf(Number(event.target.id))
-  const elem = this.state.searchResults[elemNumber]
-  this.setState({
-    modalImage: elem,
-    showModal: true
-  })
-}
-
-closeModal = () => {
-  this.setState({
-    showModal: false
-  })
-}
-
-  render(){
+  const closeModal = () => {
+    setShowModal(false)
+    }
+  
     return(
       <div className = {s.App}> 
         <Searchbar onSubmit = {this.onSubmitForm}/>
-        <ImageGallery onClick = {this.renderModalImage}>
+        <ImageGallery onClick = {renderModalImage}>
           <ImageGalleryItem array = {this.state.searchResults} />
         </ImageGallery>
         <Loader
@@ -89,11 +73,10 @@ closeModal = () => {
           width={100}
           visible={this.state.showLoading}
         />
-        {this.state.totalPages && <Button onClick = {this.loadMoreImages}/>}
-        {this.state.showModal && <Modal image = {this.state.modalImage} closeModal = {this.closeModal}/>}
+        {totalPages && <Button onClick = {loadMoreImages}/>}
+        {showModal && <Modal image = {modalImage} closeModal = {closeModal}/>}
       </div>
     )
-  };
 }
 
 export default App;
