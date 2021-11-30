@@ -37,7 +37,6 @@ function App(){
 
 const onSubmitForm = (event) => {
   event.preventDefault()
-  console.dir(event.target.lastChild.value)
   setSearchQuery(event.target.lastChild.value)
   setPageNumber(1)
   setSearchResults([])

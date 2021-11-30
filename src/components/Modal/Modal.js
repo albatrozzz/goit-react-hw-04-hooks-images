@@ -7,35 +7,30 @@ const modalRoot = document.querySelector('#modal-root')
 export default function Modal({ image, closeModal}){
 
     useEffect(() => {
-        window.addEventListener('keydown', this.closeModal)
+        window.addEventListener('keydown', onCloseModal)
 
-        return 
+        return () =>{
+            window.removeEventListener('keydown', onCloseModal)
+        }
     })
 
-// componentDidMount(){
-//     window.addEventListener('keydown', this.closeModal)
-// }
 
-// componentWillUnmount(){
-//     window.removeEventListener('keydown', this.closeModal)
-// }
+    const overlayClick = (event) => {
+        if (event.target === event.currentTarget){
+            closeModal()
+        }
+    }
 
-// overlayClick = (event) => {
-//     if (event.target === event.currentTarget){
-//         this.props.closeModal()
-//     }
-// }
-
-// closeModal = (event) => {
-//     if (event.code === 'Escape'){
-//         this.props.closeModal()
-//     }
-// }
+    const onCloseModal = (event) => {
+        if (event.code === 'Escape'){
+            closeModal()
+        }
+    }
 
     return createPortal(
-        <div className={s.Overlay} onClick = {this.overlayClick}>
+        <div className={s.Overlay} onClick = {overlayClick}>
             <div className={s.Modal} >
-                <img src={this.props.image.largeImageURL} alt={this.props.image.tags} />
+                <img src={image.largeImageURL} alt={image.tags} />
             </div>
         </div>, modalRoot
     )

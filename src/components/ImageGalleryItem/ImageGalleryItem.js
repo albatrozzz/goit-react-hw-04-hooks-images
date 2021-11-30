@@ -2,7 +2,6 @@ import PropTypes from 'prop-types'
 import s from './ImageGalleryItem.module.css'
 
 export default function ImageGalleryItem({array}){
-    console.log(array)
     return array.map(item => {
         return (
             <li className={s.ImageGalleryItem} key = {item.id} >
