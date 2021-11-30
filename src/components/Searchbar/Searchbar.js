@@ -10,9 +10,14 @@ export default function Searchbar({onSubmit}){
         setInputValue(event.target.value)
     }
 
+    const formSubmit = (event) => {
+        event.preventDefault()
+        onSubmit(inputValue)
+    }
+
     return(
         <header className= {s.Searchbar}>
-            <form className={s.SearchForm} onSubmit = {onSubmit}> 
+            <form className={s.SearchForm} onSubmit = {formSubmit}> 
                 <button type="submit" className={s.button} >
                 <span className={s.label}>Search</span>
                 </button>

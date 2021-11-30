@@ -35,9 +35,8 @@ function App(){
     // eslint-disable-next-line
   }, [searchQuery, pageNumber])
 
-const onSubmitForm = (event) => {
-  event.preventDefault()
-  setSearchQuery(event.target.lastChild.value)
+const onSubmitForm = (query) => {
+  setSearchQuery(query)
   setPageNumber(1)
   setSearchResults([])
   setTotalPages(null)
